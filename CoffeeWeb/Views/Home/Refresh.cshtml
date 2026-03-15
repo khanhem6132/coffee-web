@@ -1,0 +1,36 @@
+﻿@model CoffeeWeb.Models.StatisticalProcViewModel
+@if (Model != null)
+{
+    <div class="thongke">
+        <table class="table">
+            <tr>
+                <td>Today</td>
+                <td>@Model.Today</td>
+            </tr>
+            <tr>
+                <td>Yesterday</td>
+                <td>@Model.Yesterday</td>
+            </tr>
+            <tr>
+                <td>This Week</td>
+                <td>@Model.ThisWeek</td>
+            </tr>
+            <tr>
+                <td>Last Week</td>
+                <td>@Model.LastWeek</td>
+            </tr>
+            <tr>
+                <td>This Month</td>
+                <td>@Model.ThisMonth</td>
+            </tr>
+            <tr>
+                <td>Last Month</td>
+                <td>@Model.LastMonth</td>
+            </tr>
+            <tr>
+                <td>Online Users</td>
+                <td>@ViewBag.VisitorsOnline</td>
+            </tr>
+        </table>
+    </div>
+}

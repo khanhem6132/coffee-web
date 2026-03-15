@@ -1,0 +1,116 @@
+﻿@model CoffeeWeb.Models.EF.Order
+@using PagedList;
+@{
+    ViewBag.Title = "Danh sách đơn hàng";
+}
+
+
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Order Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Order Code</label>
+                        <p class="form-control">@Model.Code</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <p class="form-control">@Model.CustomerName</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Total Amount</label>
+                        <p class="form-control">@Model.TotalAmount.ToString("#,##0") VND</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <p class="form-control">@Model.Phone</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Created Date</label>
+                        <p class="form-control">@Model.CreateDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <p class="form-control">@Model.Email</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Payment</label>
+                        <p class="form-control">
+                            @(Model.TypePayment == 1 ? "Pending Payment" : "Paid")
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <p class="form-control">
+                            @{
+                                string statusText = "";
+                                switch (Model.Status)
+                                {
+                                    case CoffeeWeb.Models.EF.Enum.OrderStatus.Wait_for_confirmation:
+                                        statusText = "Waiting for Confirmation";
+                                        break;
+                                    case CoffeeWeb.Models.EF.Enum.OrderStatus.Confirmed:
+                                        statusText = "Confirmed";
+                                        break;
+                                    case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivering:
+                                        statusText = "Delivering";
+                                        break;
+                                    case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivered:
+                                        statusText = "Delivered";
+                                        break;
+                                    case CoffeeWeb.Models.EF.Enum.OrderStatus.Completed:
+                                        statusText = "Completed";
+                                        break;
+                                }
+                            }
+                            @statusText
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <h2>Product List</h2>
+                </div>
+                <div class="col-12">
+                    @Html.Action("Partial_Product", "Order", new { id = Model.Id })
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+            Footer
+        </div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>

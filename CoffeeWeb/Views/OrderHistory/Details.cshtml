@@ -1,0 +1,92 @@
+﻿@model CoffeeWeb.Models.EF.Order
+@{
+    ViewBag.Title = "Order Details #" + Model.Code;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top:160px; margin-bottom:100px">
+    <main aria-labelledby="title" class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4">
+                <h2 id="title" class="text-center mb-4">@ViewBag.Title</h2>
+
+                <p><strong>Order Date:</strong> @Model.CreateDate.ToString("dd/MM/yyyy")</p>
+                <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("#,##0") VND</p>
+                <p>
+                    <strong>Payment Method:</strong>
+                    @(Model.TypePayment == 1 ? "Cash on Delivery" : "Bank Card Payment")
+                </p>
+                <p>
+                    <strong>Order Status:</strong>
+                    @{
+                        string statusText = "";
+                        switch (Model.Status)
+                        {
+                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Wait_for_confirmation:
+                                statusText = "Wait for confirmation";
+                                break;
+                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Confirmed:
+                                statusText = "Confirmed";
+                                break;
+                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivering:
+                                statusText = "Delivering";
+                                break;
+                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivered:
+                                statusText = "Delivered";
+                                break;
+                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Completed:
+                                statusText = "Completed";
+                                break;
+                        }
+                    }
+                    @statusText
+                </p>
+
+                <hr />
+
+                <h4 class="mb-3">Products in this Order:</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th>#</th>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int i = 1;
+                                foreach (var item in Model.OrderDetails)
+                                {
+                                    var subTotal = item.Quantity * item.Price;
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>
+                                            <img src="@item.Product.Image" width="60" />
+                                        </td>
+                                        <td>@item.Product.Title</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Price.ToString("#,##0") VND</td>
+                                        <td>@subTotal.ToString("#,##0") VND</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="@Url.Action("MyOrders", "OrderHistory")"
+                       class="btn btn-outline-secondary w-100">
+                        ← Back to My Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

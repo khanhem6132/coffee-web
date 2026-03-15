@@ -1,0 +1,111 @@
+﻿@model CoffeeWeb.Models.EF.News
+@{
+    ViewBag.Title = "Tin tức";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+
+<style>
+    .news_section_container {
+        margin-top: 160px;
+    }
+
+    .title-news {
+        font-size: 24px;
+        border-bottom: 1px solid;
+        padding: 15px 0;
+        margin-bottom: 25px;
+/*        margin-left: 110px;*/
+    }
+
+    .row-item-new {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 40px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 25px;
+        gap: 25px;
+    }
+
+    /* Cột ảnh */
+    .img-box {
+        text-align: right; /* ảnh nằm bên phải trong khung của nó */
+        flex: 0 0 30%; /* chiếm 30% độ rộng */
+    }
+
+        .img-box img {
+            width: 100%;
+            max-width: 260px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .img-box img:hover {
+                transform: scale(1.05);
+            }
+
+    /* Cột nội dung */
+    .content-box {
+        flex: 1;
+        padding-left: 10px;
+    }
+
+        .content-box h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+            .content-box h3 a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+                .content-box h3 a:hover {
+                    text-decoration: underline;
+                }
+
+    .description-box {
+        font-size: 15px;
+        color: #555;
+        line-height: 1.6;
+        text-align: justify;
+    }
+</style>
+
+<div class="container news_section_container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="title-news">News</div>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md12">
+                <h3 class="title_news text-danger">@Model.Title</h3>
+            </div>
+        </div>
+        
+        <div class="col-md12">
+            @Model.Description
+        </div>
+
+
+        <div class="col-md12">
+            @Html.Raw(Model.Detail)
+        </div>
+
+
+    }
+    else
+    {
+<div class="text-center text-muted">There are no articles yet.</div>
+    }
+</div>

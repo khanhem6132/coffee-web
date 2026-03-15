@@ -1,0 +1,99 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.Product>
+@{
+    ViewBag.Title = "Product Comparison";
+}
+
+<div class="container pt-5 mt-5 mb-5">
+    <div class="text-center mb-4">
+        <h2 class="mb-0 text-danger">Product Comparison</h2>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="align-middle" style="width:200px;">Attribute</th>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <th class="align-middle">@item.Title</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Image -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Image</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            var img = item.ProductImage.FirstOrDefault(x => x.IsDefault)?.Image ?? "";
+                            <td>
+                                <img src="@img" alt="@item.Title"
+                                     class="img-fluid rounded mx-auto d-block"
+                                     style="max-height:150px;" />
+                            </td>
+                        }
+                    </tr>
+
+                    <!-- Price -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Price</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td>
+                                @if (item.PriceSale > 0)
+                                {
+                                    <div class="text-danger fw-bold">@item.PriceSale.GetValueOrDefault().ToString("#,##0") VND</div>
+                                    <div class="text-muted text-decoration-line-through">@item.Price.ToString("#,##0") VND</div>
+                                }
+                                else
+                                {
+                                    <div class="fw-bold">@item.Price.ToString("#,##0") VND</div>
+                                }
+                            </td>
+                        }
+                    </tr>
+
+                    <!-- Category -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Category</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td>@item.ProductCategory.Title</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Description</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td class="text-start" style="max-width:300px; word-wrap: break-word;">
+                                @Html.Raw(item.Detail)
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No products available for comparison.</p>
+    }
+</div>
+
+<style>
+    table.table thead th {
+        background-color: #f8f9fa;
+        vertical-align: middle;
+    }
+
+    table.table td img {
+        margin: auto;
+        display: block;
+    }
+
+    body {
+        padding-top: 100px; /* adjust depending on navbar height */
+    }
+</style>

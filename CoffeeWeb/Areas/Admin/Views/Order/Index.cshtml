@@ -1,0 +1,165 @@
+﻿@model PagedList.IPagedList<CoffeeWeb.Models.EF.Order>
+@using PagedList;
+@using PagedList.Mvc;
+@using CoffeeWeb.Models.EF;  
+
+@{
+    ViewBag.Title = "Orders List";
+}
+
+
+
+<section class="content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Orders List</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered text-center">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th>#</th>
+                        <th>Order</th>
+                        <th>Customer Name</th>
+                        <th>Phone</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        int i = ((ViewBag.Page - 1) * ViewBag.PageSize) + 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.Code</td>
+                                <td>@item.CustomerName</td>
+                                <td>@item.Phone</td>
+                                <td>@item.TotalAmount.ToString("#,##0") VND</td>
+                                <td>@(item.TypePayment==1 ? "Cash on Delivery" : "Bank Card Payment")</td> <!-- giữ nguyên -->
+                                <td>
+                                    @{
+                                        string statusText="";
+                                        switch (item.Status)
+                                        {
+                                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Wait_for_confirmation:
+                                                statusText = "Wait for confirmation";
+                                                break;
+                                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Confirmed:
+                                                statusText = "Confirmed";
+                                                break;
+                                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivering:
+                                                statusText = "Delivering";
+                                                break;
+                                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivered:
+                                                statusText = "Delivered";
+                                                break;
+                                            case CoffeeWeb.Models.EF.Enum.OrderStatus.Completed:
+                                                statusText = "Completed";
+                                                break;
+                                        }
+                                    }
+                                    @statusText
+                                </td>
+
+                                <td>@item.CreateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <a href="/admin/order/view/@item.Id" class="btn btn-sm btn-success">View</a>
+                                    <a href="#"
+                                       class="btn btn-sm btn-primary btnCapnhat"
+                                       data-id="@item.Id"
+                                       data-status="@((int)item.Status)">
+                                        Update Status   
+                                    </a>
+
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">No orders found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="row mt-3">
+                <div class="col-6"></div>
+                <div class="col-6 text-right">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Update status</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="txtOrderId" value="0" />
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-control" id="ddTrangthai">
+                        <option value="1">Wait for confirmation</option>
+                        <option value="2">Confirmed</option>
+                        <option value="3">Delivering</option>
+                        <option value="4">Delivered</option>
+                        <option value="5">Completed</option>
+                    </select>
+
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary btnLuu">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            // Mở modal
+            $('body').on('click', '.btnCapnhat', function (e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+                var st = $(this).data("status");
+                $('#txtOrderId').val(id);
+                $('#ddTrangthai').val(st);
+                $('#modal-default').modal('show');
+            });
+            $('body').on('click', '.btnLuu', function () {
+                var id = $('#txtOrderId').val();
+                var tt = $('#ddTrangthai').val();
+                $.ajax({
+                    url: '/admin/order/UpdateTT',
+                    type: 'POST',
+                    data: { id: id, trangthai: tt },
+                    success: function (rs) {
+                        if (rs.Success) {
+                            location.reload();
+                        } else {
+                            alert("Cập nhật thất bại!");
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
+            });
+        });
+    </script>
+}

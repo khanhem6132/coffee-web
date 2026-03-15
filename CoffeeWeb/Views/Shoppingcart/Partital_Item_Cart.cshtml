@@ -1,0 +1,75 @@
+﻿@model IEnumerable<CoffeeWeb.Models.ShoppingCartItem>
+
+<table class="table">
+    <tr class="text-center">
+        <th>No.</th>
+        <th>Product Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th style="width:100px">Quantity</th>
+        <th>Total</th>
+        <th>Action</th>
+    </tr>
+
+    @if (Model != null && Model.Any())
+    {
+        var i = 0;
+        long totalPrice = 0;
+
+        foreach (var item in Model)
+        {
+            totalPrice += item.TotalPrice;
+
+            <tr class="text-center" id="trow_@item.ProductId">
+                <td>@(i + 1)</td>
+                <td><img src="@item.ProductImg" width="60" /></td>
+                <td>@item.ProductName</td>
+                <td>@item.CategoryName</td>
+                <td>@item.Price.ToString("#,##0") VND</td>
+                <td>
+                    <input type="number"
+                           class="form-control quantity"
+                           id="Quantity_@item.ProductId"
+                           value="@item.Quantity"
+                           min="1"
+                           data-id="@item.ProductId"
+                           data-price="@item.Price" />
+                </td>
+                <th class="item-total">@item.TotalPrice.ToString("#,##0") VND</th>
+                <td>
+                    <a href="#"
+                       data-id="@item.ProductId"
+                       class="btn btn-sm btn-outline-danger btnDelete">
+                        <i class="fa fa-trash"></i> Remove
+                    </a>
+                </td>
+            </tr>
+            i++;
+        }
+
+        <tr>
+            <th colspan="6" class="text-right">Grand Total:</th>
+            <th class="text-center total-cart">@totalPrice.ToString("#,##0") VND</th>
+            <th></th>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <th colspan="8">Your shopping cart is empty!</th>
+        </tr>
+    }
+</table>
+
+@if (Model != null && Model.Any())
+{
+    <div class="d-flex justify-content-end mt-3 gap-2">
+        <a href="/checkout" class="btn btn-success">
+            <i class="fa fa-credit-card"></i> Checkout
+        </a>
+        <a href="#" class="btn btn-outline-danger btnDeleteAll">
+            <i class="fa fa-trash"></i> Clear Cart
+        </a>
+    </div>
+}

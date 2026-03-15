@@ -1,0 +1,55 @@
+﻿@model CoffeeWeb.Models.EF.Category
+@{
+    ViewBag.Title = "Add New Category";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Add New Category Information</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="bs-stepper-content">
+                @using (Html.BeginForm("Add", "Category", FormMethod.Post, new { }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    <div id="logins-part" class="content active dstepper-block" role="tabpanel" aria-labelledby="logins-part-trigger">
+
+                        @*<div class="form-group">
+                                <label>Order</label>
+                                @Html.TextBoxFor(x => x.Id, new { @class = "form-control" })
+                            </div>*@
+
+                        <div class="form-group">
+                            <label>Category Name</label>
+                            @Html.TextBoxFor(x => x.Title, new { @class = "form-control", @placeholder = "Category name" })
+                            @Html.ValidationMessageFor(x => x.Title, null, new { @class = "text-danger" })
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <a href="/admin/category" class="btn btn-danger">Back</a>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- /.card-body -->
+        <div class="card-footer"></div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>
+<!-- /.content -->

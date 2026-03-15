@@ -1,0 +1,93 @@
+﻿@model CoffeeWeb.Models.OrderViewModel
+@{
+    ViewBag.Title = "Payment";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+
+            <div class="breadcrumbs d-flex flex-row align-items-center">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li class="active"><a href="/"><i class="fa fa-angle-right" aria-hidden="true"></i>Cart</a></li>
+                </ul>
+            </div>
+
+
+
+            <!-- Main Content -->
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1 class="">Payment</h1>
+                    <p>Please double check your order information!</p>
+                </div>
+
+
+            </div>
+            <hr />
+            @if (ViewBag.CheckCart != null)
+            {
+                <div class="row">
+                    @*<div style="display:none" id="show_success"></div>*@
+                    <div id="show_success"></div>
+                    <div class="col-md-8">
+                       @Html.Action("Partial_Checkout", "ShoppingCart")
+                    </div>
+                    <div class="col-md-4">
+                        @Html.Action("Partital_Item_Payment", "ShoppingCart")
+                    </div>
+                </div>
+            }
+            else
+            {
+        <div>
+            You haven't added any products yet. Please return to the page. <a href="/product">product</a> to make a purchase
+        </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script src="~/Content/assets/js/categories_custom.js"></script>
+    <script>
+        function OnFailure(rs) {
+            if (!rs.Success) {
+                $('show_success').html('Bạn mua hàng thất bại! Xin vui lòng thử lại');
+            }
+        }
+
+        $(document).ready(function () {
+            $("#myForm").validate({
+                rules: {
+                    'CustomerName': {
+                        required: true
+                    },
+                    'Phone': {
+                        required: true
+                    },
+                    'Address': {
+                        required: true
+                    },
+                    'Email': {
+                        required: true
+                    }
+                },
+                messages: {
+                    'CustomerName':'Bạn không để trống trường này',
+                    'Phone':'Bạn không để trống trường này',
+                    'Address':'Bạn không để trống trường này',
+                    'Email':'Bạn không để trống trường này'
+                }
+            });
+        });
+    </script>
+}
+
+

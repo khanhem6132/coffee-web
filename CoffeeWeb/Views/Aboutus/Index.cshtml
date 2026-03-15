@@ -1,0 +1,174 @@
+﻿@model CoffeeWeb.Models.EF.Aboutus
+@{
+    ViewBag.Title = "About Us";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Content/assets/styles/main_styles.css" />
+
+<style>
+    /* ===== SECTION ===== */
+    .about_section {
+        margin-top: 150px;
+        padding: 40px 0;
+        width: 100%;
+    }
+
+    /* ===== TITLE ===== */
+    .about-page-title {
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 40px;
+        position: relative;
+        display: inline-block;
+    }
+
+        .about-page-title::after {
+            content: "";
+            width: 120px;
+            height: 2px;
+            background: #000;
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+        }
+
+    /* ===== LAYOUT ===== */
+    .about-wrapper {
+        display: flex;
+        gap: 50px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .about-image {
+        flex: 0 0 40%;
+        text-align: center;
+    }
+
+        .about-image img {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: block;
+            margin: 0 auto;
+        }
+
+    .about-content {
+        flex: 1;
+    }
+
+        .about-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+    .about-desc {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        text-align: justify;
+    }
+
+    .about-detail {
+        font-size: 16px;
+        color: #333;
+        line-height: 1.9;
+        text-align: justify;
+    }
+
+    /* ===== KHÔNG CÓ ẢNH => FULL WIDTH ===== */
+    .about-wrapper.no-image .about-content {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* ===== MEDIA (Razor-safe) ===== */
+    @@media (max-width: 991px) {
+        .about-wrapper {
+            gap: 30px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .about-wrapper {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .about-page-title {
+            font-size: 26px;
+        }
+
+            .about-page-title::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+        .about-desc,
+        .about-detail {
+            text-align: left;
+        }
+    }
+</style>
+
+<section class="about_section">
+    <div class="container-fluid">
+
+        <!-- TITLE -->
+        <!--<div class="row mb-4">
+            <div class="col-12">
+                <h2 class="about-page-title">About Us</h2>
+            </div>
+        </div>-->
+
+        <!-- CONTENT -->
+        @if (Model != null)
+        {
+            var hasImage = !string.IsNullOrEmpty(Model.Image);
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="about-wrapper @(hasImage ? "" : "no-image")">
+
+                        @if (hasImage)
+                        {
+                            <div class="about-image">
+                                <img src="@Model.Image" alt="@Model.Title" />
+                            </div>
+                        }
+
+                        <div class="about-content">
+                            <h3>@Model.Title</h3>
+
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <div class="about-desc">
+                                    @Model.Description
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.Detail))
+                            {
+                                <div class="about-detail">
+                                    @Html.Raw(Model.Detail)
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                No About Us content available.
+            </div>
+        }
+
+    </div>
+</section>

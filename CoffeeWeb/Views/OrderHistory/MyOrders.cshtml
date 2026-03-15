@@ -1,0 +1,89 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.Order>
+@{
+    ViewBag.Title = "My Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top:160px; margin-bottom:100px">
+    <main aria-labelledby="title" class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4">
+                <h2 id="title" class="text-center mb-4">@ViewBag.Title</h2>
+
+                @if (!Model.Any())
+                {
+                    <p class="text-center text-muted">You don't have any orders yet.</p>
+                    <div class="text-center mt-3">
+                        @Html.ActionLink("← Back to Home", "Index", "Home", null,
+                            new { @class = "text-decoration-none text-secondary" })
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="bg-secondary text-white">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Order Code</th>
+                                    <th>Total Amount</th>
+                                    <th>Order Date</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int i = 1;
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@item.Code</td>
+                                            <td>@item.TotalAmount.ToString("#,##0") VND</td>
+                                            <td>@item.CreateDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@(item.TypePayment == 1 ? "Cash on Delivery" : "Bank Card Payment")</td>
+                                            <td>
+                                                @{
+                                                    string statusText="";
+                                                    switch (item.Status)
+                                                    {
+                                                        case CoffeeWeb.Models.EF.Enum.OrderStatus.Wait_for_confirmation:
+                                                            statusText = "Wait for confirmation";
+                                                            break;
+                                                        case CoffeeWeb.Models.EF.Enum.OrderStatus.Confirmed:
+                                                            statusText = "Confirmed";
+                                                            break;
+                                                        case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivering:
+                                                            statusText = "Delivering";
+                                                            break;
+                                                        case CoffeeWeb.Models.EF.Enum.OrderStatus.Delivered:
+                                                            statusText = "Delivered";
+                                                            break;
+                                                        case CoffeeWeb.Models.EF.Enum.OrderStatus.Completed:
+                                                            statusText = "Completed";
+                                                            break;
+                                                    }
+                                                }
+                                                @statusText
+                                            </td>
+
+                                            <td>
+                                                <a href="@Url.Action("Details", "OrderHistory", new { id = item.Id })"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+</div>

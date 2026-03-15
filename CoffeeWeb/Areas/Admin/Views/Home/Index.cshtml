@@ -1,0 +1,227 @@
+﻿@model PagedList.PagedList<CoffeeWeb.Models.EF.Order>
+@using PagedList;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Revenue Report";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">📈 Daily Revenue Report</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool text-white" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                <button type="button" class="btn btn-tool text-white" data-card-widget="remove"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Date filter -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label for="fromDate">From date:</label>
+                    <input type="text" id="fromDate" class="form-control" placeholder="Select start date" autocomplete="off" />
+                </div>
+                <div class="col-md-3">
+                    <label for="toDate">To date:</label>
+                    <input type="text" id="toDate" class="form-control" placeholder="Select end date" autocomplete="off" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button id="btnFilter" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chart + table -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart-container" style="position: relative; height: 350px;">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Revenue</th>
+                                <th>Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="load_data"></tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-6"></div>
+                        <div class="col-6" style="text-align:right">
+                            @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <!-- Required libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script src="~/Content/assets/plugins/chart.js/Chart.min.js"></script>
+
+    <script>
+        // Currency formatter (VND)
+        function formatVND(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        $(function () {
+            // Init Date Range Picker
+            $('#fromDate, #toDate').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    applyLabel: 'Apply',
+                    cancelLabel: 'Cancel',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: [
+                        'January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'
+                    ],
+                    firstDay: 1
+                }
+            }).on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY'));
+            });
+
+            // Load default data
+            loadChartData('', '');
+
+            // Filter button
+            $('#btnFilter').click(function () {
+                const fromDate = $('#fromDate').val();
+                const toDate = $('#toDate').val();
+                loadChartData(fromDate, toDate);
+            });
+        });
+
+        // Load data + update chart
+        let barChartInstance = null;
+
+        function loadChartData(fromDate, toDate) {
+            $.ajax({
+                url: '/Admin/Home/GetStatistics',
+                type: 'GET',
+                data: { fromDate: fromDate, toDate: toDate },
+                beforeSend: function () {
+                    $('#btnFilter').prop('disabled', true).text('Loading...');
+                },
+                success: function (res) {
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter"></i> Filter');
+
+                    if (!res.Data || res.Data.length === 0) {
+                        $('#load_data').html('<tr><td colspan="4">No data available</td></tr>');
+                        if (barChartInstance) barChartInstance.destroy();
+                        return;
+                    }
+
+                    const arrDate = [];
+                    const arrRevenue = [];
+                    const arrProfit = [];
+
+                    $.each(res.Data, function (i, item) {
+                        arrDate.push(item.Date);
+                        arrRevenue.push(Number(item.DoanhThu) || 0);
+                        arrProfit.push(Number(item.LoiNhuan) || 0);
+                    });
+
+                    // Draw chart
+                    const ctx = $('#barChart').get(0).getContext('2d');
+                    if (barChartInstance) barChartInstance.destroy();
+
+                    barChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: arrDate,
+                            datasets: [
+                                {
+                                    label: 'Revenue',
+                                    backgroundColor: '#6c757d',
+                                    data: arrRevenue,
+                                    yAxisID: 'yRevenue'
+                                },
+                                {
+                                    label: 'Profit',
+                                    backgroundColor: '#007bff',
+                                    data: arrProfit,
+                                    yAxisID: 'yProfit'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                yAxes: [
+                                    {
+                                        id: 'yRevenue',
+                                        position: 'left',
+                                        ticks: {
+                                            beginAtZero: true,
+                                            callback: function (value) { return value.toLocaleString('vi-VN'); }
+                                        }
+                                    },
+                                    {
+                                        id: 'yProfit',
+                                        position: 'right',
+                                        gridLines: { drawOnChartArea: false },
+                                        ticks: {
+                                            beginAtZero: true,
+                                            callback: function (value) { return value.toLocaleString('vi-VN'); }
+                                        }
+                                    }
+                                ],
+                                xAxes: [
+                                    {
+                                        ticks: { autoSkip: true, maxTicksLimit: 10 }
+                                    }
+                                ]
+                            },
+                            tooltips: {
+                                callbacks: {
+                                    label: function (tooltipItem, data) {
+                                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                        return label + ': ' + formatVND(tooltipItem.yLabel);
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Update table
+                    let html = '';
+                    $.each(res.Data, function (i, item) {
+                        html += `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td>${item.Date}</td>
+                                    <td>${formatVND(item.DoanhThu)}</td>
+                                    <td>${formatVND(item.LoiNhuan)}</td>
+                                </tr>`;
+                    });
+                    $('#load_data').html(html);
+                },
+                error: function () {
+                    alert('Error while loading data!');
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter"></i> Filter');
+                }
+            });
+        }
+    </script>
+}

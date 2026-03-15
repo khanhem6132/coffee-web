@@ -1,0 +1,106 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.Product>
+
+@{
+    ViewBag.Title = "Search Results";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top:120px;">
+    <h3 class="text-center mb-4">
+        Search results for:
+        <span class="text-danger">"@Request.QueryString["searchText"]"</span>
+    </h3>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                var strImg = "";
+                var img = item.ProductImage?.FirstOrDefault(x => x.IsDefault);
+                if (img != null)
+                {
+                    strImg = img.Image;
+                }
+
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
+                    <div class="card border-0 shadow-sm w-100 text-center position-relative hover-card">
+
+                        <!-- SALE Badge -->
+                        @if (item.PriceSale > 0)
+                        {
+                            <div class="product_bubble product_bubble_red position-absolute top-0 end-0 m-2">
+                                <span>SALE</span>
+                            </div>
+                        }
+
+                        <!-- Product Image -->
+                        <img src="@strImg" class="card-img-top img-fluid p-3" alt="@item.Title"
+                             style="height: 250px; object-fit: contain;">
+
+                        <!-- Content -->
+                        <div class="card-body">
+                            <h5 class="card-title text-dark fw-bold mb-2">@item.Title</h5>
+
+                            <!-- Price Display -->
+                            @if (item.PriceSale > 0)
+                            {
+                                <p class="card-text mb-2">
+                                    <span class="text-danger fw-bold fs-5">
+                                        @item.PriceSale.GetValueOrDefault().ToString("#,##0") VND
+                                    </span>
+                                    <span class="text-muted text-decoration-line-through ms-2">
+                                        @item.Price.ToString("#,##0") VND
+                                    </span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="card-text mb-2">
+                                    <span class="text-dark fw-bold fs-5">
+                                        @item.Price.ToString("#,##0") VND
+                                    </span>
+                                </p>
+                            }
+
+                            <a href="/detail/@item.Alias-p@(item.Id)"
+                               class="btn btn-outline-primary btn-sm">View Details</a>
+                            <a href="#" class="btn btn-danger btn-sm ms-2 btnAddToCart" data-id="@item.Id">
+                                Add to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted py-5">
+            <h5>No matching products found.</h5>
+        </div>
+    }
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    .product_bubble {
+        background-color: #df3b3b;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+</style>

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.OrderDetail>
+@if (Model != null && Model.Any())
+{
+    int i = 1;
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Product name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var total = @item.Price * @item.Quantity;
+                <tr>
+                    <td>@i</td>
+                    <td>@item.Product.Title</td>
+                    <td>@item.Price.ToString("#,##0") VND</td>
+                    <td>@item.Quantity</td>
+                    <td>@total.ToString("#,##0") VND </td>
+                </tr>
+                i++;
+            }
+
+        </tbody>
+    </table>
+}

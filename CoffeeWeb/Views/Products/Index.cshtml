@@ -1,0 +1,220 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.Product>
+@{
+    ViewBag.Title = "Product List";
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+            <div class="breadcrumbs d-flex flex-row align-items-center">
+                <ul>
+                    <li><a href="/Home/Index">Home</a></li>
+                    <li class="active">
+                        <a href="/"><i class="fa fa-angle-right" aria-hidden="true"></i>Products</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar_section">
+                    <div class="sidebar_title"><h5>Product Categories</h5></div>
+                    @Html.Action("MenuLeft", "Menu")
+                    
+                    @*<div class="thongkeContainer">
+                        @Html.Action("Refresh", "Home")
+                    </div>*@
+                </div>
+
+                <div class="sidebar_section">
+                    <div class="sidebar_title"><h5>Statistical User</h5></div>
+                    <div class="thongkeContainer">
+                        @Html.Action("Refresh", "Home")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main_content">
+
+                <!-- Product Sorting Top Bar -->
+                <div class="product_sorting_container product_sorting_container_top d-flex justify-content-between align-items-center">
+                    <ul class="product_sorting d-flex">
+                        <li>
+                            <span class="type_sorting_text">Default Sorting</span>
+                            <i class="fa fa-angle-down"></i>
+                            <ul class="sorting_type">
+                                <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "original-order" }'>
+                                    <span>Default Sorting</span>
+                                </li>
+                                <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "price" }'>
+                                    <span>Price</span>
+                                </li>
+                                <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "name" }'>
+                                    <span>Product Name</span>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span>Show</span>
+                            <span class="num_sorting_text">6</span>
+                            <i class="fa fa-angle-down"></i>
+                            <ul class="sorting_num">
+                                <li class="num_sorting_btn"><span>6</span></li>
+                                <li class="num_sorting_btn"><span>12</span></li>
+                                <li class="num_sorting_btn"><span>24</span></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <div class="compare_button ml-3">
+                        <button id="btnStartCompare" class="btn btn-warning btn-sm">Compare Products</button>
+                    </div>
+
+                    <div class="pages d-flex flex-row align-items-center">
+                        <div class="page_current">
+                            <span>1</span>
+                            <ul class="page_selection">
+                                <li><a href="#">1</a></li>
+                                <li><a href="#">2</a></li>
+                                <li><a href="#">3</a></li>
+                            </ul>
+                        </div>
+                        <div class="page_total"><span>of</span> 3</div>
+                        <div id="next_page" class="page_next">
+                            <a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="products_iso">
+                    <div class="row">
+                        <div class="col">
+                            <div class="product-grid">
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        var strImg = "";
+                                        var img = item.ProductImage.FirstOrDefault(x => x.IsDefault);
+                                        if (img != null) { strImg = img.Image; }
+
+                                        <div class="product-item @item.ProductCategory.Alias">
+                                            <div class="product discount product_filter">
+                                                <div class="product_image" style="position: relative;">
+                                                    <img src="@strImg" alt="@item.Title">
+
+                                                    <!-- Hidden overlay by default -->
+                                                    <div class="compare_overlay"
+                                                         style="display:none; position:absolute; top:10px; right:10px;
+                                                                background: rgba(255,255,255,0.8); padding:5px; border-radius:5px;">
+                                                        <input type="checkbox" class="compareItem" data-id="@item.Id" id="compare_@item.Id">
+                                                        <label for="compare_@item.Id">Compare</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="product_info">
+                                                    <h6 class="product_name">
+                                                        <a href="/detail/@item.Alias-p@(item.Id)">@item.Title</a>
+                                                    </h6>
+
+                                                    @if (item.PriceSale > 0)
+                                                    {
+                                                        <div class="product_price">
+                                                            @item.PriceSale.GetValueOrDefault().ToString("#,##0") VND
+                                                            <span>@item.Price.ToString("#,##0") VND</span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="product_price">@item.Price.ToString("#,##0") VND</div>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="red_button add_to_cart_button">
+                                                <a href="#" class="btnAddToCart" data-id="@item.Id">Add to Cart</a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/categories_custom.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            setInterval(function () {
+                $(".thongkeContainer").load("/Home/Refresh");
+            }, 20000);
+
+            var compareActive = false;
+            var compareList = [];
+
+            // Start compare
+            $("#btnStartCompare").click(function () {
+                compareActive = true;
+                $(".compare_overlay").fadeIn();
+                $(this).prop("disabled", true);
+                alert("Select up to 3 products to compare.");
+            });
+
+            // Handle checkbox selection
+            $(document).on("change", ".compareItem", function () {
+                if (!compareActive) return;
+                var productId = $(this).data("id");
+
+                if ($(this).is(":checked")) {
+                    if (compareList.length < 3) {
+                        compareList.push(productId);
+                    } else {
+                        alert("You can select up to 3 products only.");
+                        $(this).prop("checked", false);
+                    }
+                } else {
+                    compareList = compareList.filter(id => id !== productId);
+                }
+
+                // Show Compare button
+                if (compareList.length > 0) {
+                    if ($("#btnCompare").length == 0) {
+                        $(".compare_button").append(
+                            '<button id="btnCompare" class="btn btn-success btn-sm ml-2">Compare (' + compareList.length + ')</button>'
+                        );
+                    } else {
+                        $("#btnCompare").text("Compare (" + compareList.length + ")");
+                    }
+                } else {
+                    $("#btnCompare").remove();
+                }
+            });
+
+            // Click Compare
+            $(document).on("click", "#btnCompare", function () {
+                if (compareList.length < 2) {
+                    alert("Please select at least 2 products to compare.");
+                    return;
+                }
+                var url = "/Home/SoSanh?ids=" + compareList.join(",");
+                window.location.href = url;
+            });
+        });
+    </script>
+}

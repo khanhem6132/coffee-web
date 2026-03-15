@@ -1,0 +1,20 @@
+﻿@model IEnumerable<CoffeeWeb.Models.EF.Category>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="navbar_menu">
+        @foreach (var item in Model)
+        {
+            var alias = item.Alias ?? "";
+
+            if (alias == "trang-chu")
+            {
+                alias = "";
+            }
+
+            <li>
+                <a href="/@alias">@item.Title</a>
+            </li>
+        }
+    </ul>
+}
